@@ -1,0 +1,6 @@
+12/04/2026, 09:15 - Director Sharma: New admission inquiry. Parent: Ramesh Kumar, Student: Aarav Kumar, Class: 8, Phone: 9876500001, Location: Mandsaur, Interest: school
+12/04/2026, 10:02 - Director Sharma: Good morning team
+12/04/2026, 11:30 - Admin Priya: Admission inquiry. Parent Sunita Verma, Student Kavya Verma, Class LKG, Phone +919876500002, Hostel required.
+13/04/2026, 08:45 - Director Sharma: Parent Manoj Patel, Student Dhruv Patel, Class 11, 98765-00003, both school and hostel.
+13/04/2026, 14:10 - Admin Priya: Meeting at 4pm today
+14/04/2026, 09:00 - Director Sharma: Parent: Anita Joshi, Student: Riya Joshi, Class: 5, Ph: 919876500004, School only.

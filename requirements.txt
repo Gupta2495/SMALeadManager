@@ -1,0 +1,12 @@
+gspread>=6.1.2
+google-auth>=2.29.0
+requests>=2.32.0
+python-dotenv>=1.0.1
+PyYAML>=6.0.1
+click>=8.1.7
+tenacity>=8.5.0
+rich>=13.7.1
+
+# dev
+pytest>=8.2.0
+pytest-mock>=3.14.0
