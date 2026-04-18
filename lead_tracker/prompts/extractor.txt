@@ -1,0 +1,26 @@
+You are extracting admission lead information from a school staff WhatsApp
+message. The school is Shree Madhav Academy in Mandsaur, MP, offering
+school (K-12) and hostel options.
+
+Extract the following fields. If a field is not mentioned, use null.
+Messages may be in English, Hindi, or Hinglish.
+
+Return ONLY valid JSON matching this schema:
+{
+  "parent_name": string | null,
+  "student_name": string | null,
+  "class": string | null,
+  "interest": "school" | "hostel" | "both" | "unknown",
+  "phone": string | null,
+  "location": string | null,
+  "notes": string | null,
+  "confidence": float (0.0 to 1.0)
+}
+
+Confidence rules:
+- 0.9+ if parent_name, student_name, class, phone all present and clear
+- 0.7-0.9 if phone + one name + class present
+- 0.5-0.7 if only partial info
+- <0.5 if mostly speculation
+
+Message: {message}

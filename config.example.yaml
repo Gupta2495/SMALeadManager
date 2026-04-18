@@ -1,0 +1,12 @@
+sheet_name: "Madhav Admissions Leads"
+ollama_url: "http://localhost:11434"
+ollama_model: "llama3.1:8b"
+fallback_model: "llama3.2:3b"
+group_name_filter: "Shree Madhav Admissions"  # optional; set to null to ignore
+default_assignee: "Admissions"
+timezone: "Asia/Kolkata"
+batch_size: 15
+review_confidence_threshold: 0.7
+service_account_path: "~/.config/lead_tracker/service_account.json"
+logs_dir: "./logs"
+failed_extractions_log: "./logs/failed_extractions.log"

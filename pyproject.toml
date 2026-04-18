@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lead-tracker"
+version = "0.1.0"
+description = "Local batch lead tracking for Shree Madhav Academy admissions"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Shree Madhav Admissions" }]
+dependencies = [
+    "gspread>=6.1.2",
+    "google-auth>=2.29.0",
+    "requests>=2.32.0",
+    "python-dotenv>=1.0.1",
+    "PyYAML>=6.0.1",
+    "click>=8.1.7",
+    "tenacity>=8.5.0",
+    "rich>=13.7.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-mock>=3.14.0",
+]
+
+[project.scripts]
+lead_tracker = "lead_tracker.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["lead_tracker*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"lead_tracker" = ["prompts/*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

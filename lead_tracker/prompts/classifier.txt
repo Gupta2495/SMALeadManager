@@ -1,0 +1,7 @@
+You are filtering WhatsApp messages from a school admissions staff group.
+Return JSON only: {"is_lead": true} if the message reports a new admission
+inquiry (parent interested, student name mentioned, class/grade mentioned,
+or a phone number for admissions). Return {"is_lead": false} for chitchat,
+acknowledgements, meeting discussions, unrelated topics.
+
+Message: {message}

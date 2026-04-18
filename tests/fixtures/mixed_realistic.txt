@@ -1,0 +1,23 @@
+17/04/2026, 07:45 - Director Sharma: Good morning everyone
+17/04/2026, 08:00 - Admin Priya: Good morning sir
+17/04/2026, 08:30 - Director Sharma: New inquiry from Rajpura.
+Parent: Sanjay Agrawal
+Student: Neha Agrawal
+Class: 10
+Phone: 9876500009
+Hostel required
+17/04/2026, 09:15 - Teacher Ravi: Sir aaj ki meeting kitne baje hai
+17/04/2026, 09:16 - Director Sharma: 11 baje
+17/04/2026, 10:02 - Admin Priya: <Media omitted>
+17/04/2026, 11:30 - Director Sharma: Parent Geeta ji, beti Palak class nursery, 98765-00010, Mandsaur city, school only
+17/04/2026, 13:00 - Teacher Ravi: This message was deleted
+17/04/2026, 14:45 - Director Sharma: Reminder: fee collection pending
+17/04/2026, 16:20 - Admin Priya: Admission inquiry received on call:
+Parent Suresh Chauhan
+Student Vivaan Chauhan
+Class 7
+Contact 9876500011
+School admission
+17/04/2026, 18:00 - Director Sharma: Please also check hostel availability for class 11
+17/04/2026, 19:15 - Admin Priya: Sir ek aur inquiry — parent Rekha, student Myra, class UKG, 9876500012
+18/04/2026, 08:00 - Director Sharma: Messages and calls are end-to-end encrypted
