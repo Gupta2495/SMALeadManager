@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Madhav Leads — Lead Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="nav.jsx"></script>
+<script type="text/babel" src="dashboard.jsx"></script>
+<script type="text/babel" src="detail.jsx"></script>
+<script type="text/babel" src="all_leads.jsx"></script>
+<script type="text/babel" src="analytics.jsx"></script>
+<script type="text/babel" src="review.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect, useMemo } = React;
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "primary": "#1E40AF",
+  "density": "comfortable",
+  "simulateOffline": false,
+  "showTweaks": false
+}/*EDITMODE-END*/;
+
+function TweaksPanel({ state, setState }) {
+  const swatches = [
+    { name: 'Deep Blue', val: '#1E40AF' },
+    { name: 'Emerald',   val: '#047857' },
+    { name: 'Indigo',    val: '#4338CA' },
+    { name: 'Maroon',    val: '#9F1239' },
+  ];
+  return (
+    <div className="tweaks-panel">
+      <h4>Tweaks</h4>
+      <div className="tweaks-row">
+        <label>Primary color</label>
+        <div className="swatch-row">
+          {swatches.map(s => (
+            <button
+              key={s.val}
+              className={`swatch ${state.primary === s.val ? 'active' : ''}`}
+              style={{ background: s.val }}
+              title={s.name}
+              onClick={() => setState({ ...state, primary: s.val })}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="tweaks-row">
+        <label>Density</label>
+        <select className="select" style={{ minHeight: 36, padding: '6px 32px 6px 10px', fontSize: 13 }}
+          value={state.density} onChange={e => setState({ ...state, density: e.target.value })}>
+          <option value="comfortable">Comfortable</option>
+          <option value="compact">Compact</option>
+        </select>
+      </div>
+      <div className="tweaks-row">
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+          <input type="checkbox" checked={state.simulateOffline}
+            onChange={e => setState({ ...state, simulateOffline: e.target.checked })} />
+          Simulate offline
+        </label>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [route, setRoute] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mlt-route')) || { name: 'today' }; }
+    catch { return { name: 'today' }; }
+  });
+  const [leads, setLeads] = useState(LEADS);
+  const [toast, setToast] = useState(null);
+  const [reviewItems] = useState(REVIEW);
+  const [tweaks, setTweaks] = useState(TWEAKS);
+  const [tweaksOpen, setTweaksOpen] = useState(TWEAKS.showTweaks);
+
+  // Edit-mode wiring for toolbar Tweaks toggle
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  // Apply primary color
+  useEffect(() => {
+    document.documentElement.style.setProperty('--primary', tweaks.primary);
+  }, [tweaks.primary]);
+
+  useEffect(() => {
+    localStorage.setItem('mlt-route', JSON.stringify(route));
+  }, [route]);
+
+  function showToast(t) {
+    setToast(t);
+    setTimeout(() => setToast(null), 2600);
+  }
+
+  function navigate(name, params) {
+    setRoute({ name, ...(params || {}) });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function updateLead(id, patch) {
+    setLeads(leads.map(l => l.id === id ? { ...l, ...patch } : l));
+  }
+
+  function logCall(id, entry, nextFollowUp, closeAs) {
+    setLeads(leads.map(l => {
+      if (l.id !== id) return l;
+      let status = l.status;
+      if (closeAs) status = closeAs;
+      else if (entry.outcome === 'interested') status = 'interested';
+      else if (entry.outcome === 'visit_scheduled') status = 'visited';
+      else if (entry.outcome === 'callback_requested' || entry.outcome === 'busy' || entry.outcome === 'no_answer') {
+        if (l.status === 'new') status = 'contacted';
+      }
+      return { ...l, history: [entry, ...l.history], nextFollowUp: closeAs ? null : nextFollowUp, status };
+    }));
+  }
+
+  function closeLead(id, closeAs) {
+    const statusMap = { admitted: 'admitted', lost: 'lost', on_hold: 'on_hold' };
+    updateLead(id, { status: statusMap[closeAs], nextFollowUp: null });
+  }
+
+  function addNewLead() {
+    showToast({ msg: 'New lead form — opens inline modal (demo).' });
+  }
+
+  if (!user) return <LoginScreen onLogin={() => setUser({ name: 'Priya', email: 'priya@shreemadhav.in', initials: 'P', isAdmin: true })} />;
+
+  const overdueCount = leads.filter(l => {
+    if (['admitted','lost','rejected','on_hold'].includes(l.status)) return false;
+    return followUpState(l.nextFollowUp)?.kind === 'overdue';
+  }).length;
+
+  let screen;
+  if (route.name === 'today') screen = <Dashboard leads={leads} navigate={navigate} user={user} />;
+  else if (route.name === 'leads') screen = <AllLeads leads={leads} navigate={navigate} onNewLead={addNewLead} />;
+  else if (route.name === 'analytics') screen = <Analytics leads={leads} navigate={navigate} />;
+  else if (route.name === 'review') screen = <Review reviewItems={reviewItems} onPromote={() => {}} onDiscard={() => {}} showToast={showToast} />;
+  else if (route.name === 'lead') {
+    const lead = leads.find(l => l.id === route.id);
+    if (!lead) { setTimeout(() => navigate('today'), 0); screen = null; }
+    else screen = <LeadDetail lead={lead} navigate={navigate} onUpdate={updateLead} onLogCall={logCall} onClose={closeLead} showToast={showToast} />;
+  }
+  else if (route.name === 'profile') {
+    screen = (
+      <div className="page">
+        <div className="page-title">Profile</div>
+        <div className="page-sub">Priya · priya@shreemadhav.in</div>
+        <div style={{ marginTop: 24 }}>
+          <button className="btn btn-secondary" onClick={() => setUser(null)}>Sign out</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app" data-screen-label={route.name}>
+      {tweaks.simulateOffline && (
+        <div className="offline-banner"><Icon.wifi /> You're offline — showing last loaded data</div>
+      )}
+      <TopNav route={route} navigate={navigate} overdueCount={overdueCount} user={user} />
+      {screen}
+      <BottomTabs route={route} navigate={navigate} />
+      <Toast toast={toast} />
+      {tweaksOpen && <TweaksPanel state={tweaks} setState={setTweaks} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
