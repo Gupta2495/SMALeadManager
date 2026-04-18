@@ -80,6 +80,13 @@ pytest -q
 - **Google Sheets is the UI.** No web app. Status, follow-ups, and outcome
   are driven by Apps Script on top of the Sheet.
 
+## Caller-facing web UI
+
+The design prototype for the caller's web app (Today dashboard, Lead
+detail, All Leads, Analytics, Review, Login) lives in **[`web/`](web/)** —
+see [`web/README.md`](web/README.md) for how to run it and the Next.js /
+Netlify / Sheets port plan.
+
 ## Out of scope (for now)
 
 See **[FUTURE.md](FUTURE.md)**: real-time listener, SMS notifications,
