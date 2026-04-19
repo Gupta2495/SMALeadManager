@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/lib/supabase/profile";
 import type { CallOutcome, LeadStatus } from "@/lib/types";
 
-type Result<T = Record<string, never>> = ({ ok: true } & T) | { ok: false; error: string };
+type Result = { ok: true } | { ok: false; error: string };
 
 export async function updateStatusAction(
   leadId: string,

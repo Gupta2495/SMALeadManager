@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronRight, MessageCircle, Phone } from "lucide-react";
-import { StatusChip } from "@/components/StatusChip";
 import { fmtDate, fmtTime, followUpState } from "@/lib/date";
 import { formatPhoneDisplay, telHref, whatsappHref } from "@/lib/phoneFormat";
 import { getCurrentProfile } from "@/lib/supabase/profile";
