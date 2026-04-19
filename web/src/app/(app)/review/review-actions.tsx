@@ -23,7 +23,7 @@ export function ReviewActions({ leadId }: { leadId: string }) {
   }
 
   return (
-    <div className="review-actions">
+    <>
       <button
         type="button"
         className="btn btn-success-outline btn-sm"
@@ -40,6 +40,6 @@ export function ReviewActions({ leadId }: { leadId: string }) {
       >
         Discard
       </button>
-    </div>
+    </>
   );
 }

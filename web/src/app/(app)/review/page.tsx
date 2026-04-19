@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Pencil } from "lucide-react";
 import { getCurrentProfile } from "@/lib/supabase/profile";
 import type { Lead } from "@/lib/types";
 import { fmtDate } from "@/lib/date";
@@ -25,8 +27,8 @@ export default async function ReviewPage() {
         <div>
           <h1 className="page-title">Review queue</h1>
           <p className="page-sub">
-            Low-confidence extractions from the WhatsApp ingester. Promote or
-            discard.
+            Incomplete or unverified leads. Edit to fill missing info, then
+            Promote to move into the main pipeline — or Discard to delete.
           </p>
         </div>
       </div>
@@ -35,58 +37,68 @@ export default async function ReviewPage() {
         <div className="empty">Nothing to review. Ingester is cruising.</div>
       ) : (
         <div style={{ marginTop: 20 }}>
-          {rows.map((lead) => (
-            <div key={lead.id} className="review-row">
-              <div className="review-fields">
-                <div>
-                  <div className="k">Student</div>
-                  <div className="v">{lead.student_name ?? "—"}</div>
-                </div>
-                <div>
-                  <div className="k">Parent</div>
-                  <div className="v">{lead.parent_name ?? "—"}</div>
-                </div>
-                <div>
-                  <div className="k">Phone</div>
-                  <div className="v">{lead.phone}</div>
-                </div>
-                <div>
-                  <div className="k">Class</div>
-                  <div className="v">{lead.class_label ?? "—"}</div>
-                </div>
-                <div>
-                  <div className="k">Interest</div>
-                  <div className="v">{lead.interest ?? "—"}</div>
-                </div>
-                <div>
-                  <div className="k">Location</div>
-                  <div className="v">{lead.location ?? "—"}</div>
-                </div>
-                <div>
-                  <div className="k">Captured</div>
-                  <div className="v">
-                    {fmtDate(lead.captured_at, { noYear: true })}
+          {rows.map((lead) => {
+            const isDraft = lead.phone.startsWith("NOPHONE-");
+            return (
+              <div key={lead.id} className="review-row">
+                <div className="review-fields">
+                  <div>
+                    <div className="k">Student</div>
+                    <div className="v">
+                      <Link href={`/leads/${lead.id}`} style={{ color: "inherit" }}>
+                        {lead.student_name ?? "—"}
+                      </Link>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="k">Parent</div>
+                    <div className="v">{lead.parent_name ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="k">Phone</div>
+                    <div className="v">
+                      {isDraft ? (
+                        <span style={{ color: "var(--n400)", fontStyle: "italic" }}>Missing</span>
+                      ) : (
+                        lead.phone
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="k">Class</div>
+                    <div className="v">{lead.class_label ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="k">Location</div>
+                    <div className="v">{lead.location ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="k">Source</div>
+                    <div className="v">
+                      {lead.source_from ?? "—"}
+                      {lead.source_msg_date
+                        ? ` · ${fmtDate(lead.source_msg_date, { noYear: true })}`
+                        : null}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div className="k">Confidence</div>
-                  <div className="v">
-                    <span className="review-conf">
-                      {lead.confidence !== null
-                        ? `${Math.round(lead.confidence * 100)}%`
-                        : "—"}
-                    </span>
-                  </div>
+
+                {lead.notes ? (
+                  <div className="review-msg">{lead.notes}</div>
+                ) : null}
+
+                <div className="review-actions">
+                  <Link
+                    href={`/leads/${lead.id}/edit`}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    <Pencil size={13} aria-hidden /> Edit
+                  </Link>
+                  <ReviewActions leadId={lead.id} />
                 </div>
               </div>
-
-              {lead.source_message ? (
-                <div className="review-msg">&ldquo;{lead.source_message}&rdquo;</div>
-              ) : null}
-
-              <ReviewActions leadId={lead.id} />
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </>

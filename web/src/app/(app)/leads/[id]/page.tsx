@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronRight, MessageCircle, Phone } from "lucide-react";
+import { ArrowLeft, ChevronRight, MessageCircle, Pencil, Phone } from "lucide-react";
 import { fmtDate, fmtTime, followUpState } from "@/lib/date";
 import { formatPhoneDisplay, telHref, whatsappHref } from "@/lib/phoneFormat";
 import { getCurrentProfile } from "@/lib/supabase/profile";
@@ -39,11 +39,16 @@ export default async function LeadDetailPage({
 
       <div className="detail-grid">
         <div>
-          <div>
-            <h1 className="detail-title">{lead.student_name ?? "Unknown"}</h1>
-            <div className="detail-subtitle">
-              {lead.parent_name ?? "—"} · {formatPhoneDisplay(lead.phone)}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+            <div>
+              <h1 className="detail-title">{lead.student_name ?? "Unknown"}</h1>
+              <div className="detail-subtitle">
+                {lead.parent_name ?? "—"} · {formatPhoneDisplay(lead.phone)}
+              </div>
             </div>
+            <Link href={`/leads/${lead.id}/edit`} className="btn btn-secondary" style={{ flexShrink: 0 }}>
+              <Pencil size={15} aria-hidden /> Edit
+            </Link>
           </div>
 
           <div className="detail-actions">
@@ -68,6 +73,12 @@ export default async function LeadDetailPage({
               label="Captured"
               value={fmtDate(lead.captured_at, { noYear: true })}
             />
+            {lead.source_msg_date ? (
+              <Info
+                label="Source date"
+                value={fmtDate(lead.source_msg_date, { noYear: true })}
+              />
+            ) : null}
             <div>
               <div className="k">Status</div>
               <StatusSelect leadId={lead.id} initial={lead.status} />
