@@ -34,7 +34,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
           {lead.source_msg_date ? (
             <>
               <span className="sep">·</span>
-              <span>Source {fmtDate(lead.source_msg_date, { noYear: true })}</span>
+              <span>Source {fmtDate(lead.source_msg_date)}</span>
             </>
           ) : null}
           {state ? (

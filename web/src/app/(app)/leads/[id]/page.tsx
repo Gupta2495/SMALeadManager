@@ -71,12 +71,12 @@ export default async function LeadDetailPage({
             <Info label="Location" value={lead.location} />
             <Info
               label="Captured"
-              value={fmtDate(lead.captured_at, { noYear: true })}
+              value={fmtDate(lead.captured_at)}
             />
             {lead.source_msg_date ? (
               <Info
                 label="Source date"
-                value={fmtDate(lead.source_msg_date, { noYear: true })}
+                value={fmtDate(lead.source_msg_date)}
               />
             ) : null}
             <div>
@@ -90,7 +90,7 @@ export default async function LeadDetailPage({
                   ? fmtDate(lead.next_follow_up, {
                       relative: true,
                       withTime: true,
-                      noYear: true,
+                      
                     })
                   : "—"}
                 {state?.kind === "overdue" ? (
@@ -112,7 +112,7 @@ export default async function LeadDetailPage({
                   <MessageCircle size={14} aria-hidden />
                   {lead.source_from ?? "—"}
                   {lead.source_msg_date
-                    ? ` · ${fmtDate(lead.source_msg_date, { noYear: true })} at ${fmtTime(lead.source_msg_date)}`
+                    ? ` · ${fmtDate(lead.source_msg_date)} at ${fmtTime(lead.source_msg_date)}`
                     : null}
                 </div>
                 &ldquo;{lead.source_message}&rdquo;
@@ -139,7 +139,7 @@ export default async function LeadDetailPage({
                         {h.outcome ? OUTCOME_LABELS[h.outcome] : h.type}
                       </span>
                       <span className="when">
-                        {fmtDate(h.created_at, { relative: true, noYear: true })} at{" "}
+                        {fmtDate(h.created_at, { relative: true })} at{" "}
                         {fmtTime(h.created_at)}
                       </span>
                     </div>

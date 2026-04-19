@@ -77,7 +77,7 @@ export default async function ReviewPage() {
                     <div className="v">
                       {lead.source_from ?? "—"}
                       {lead.source_msg_date
-                        ? ` · ${fmtDate(lead.source_msg_date, { noYear: true })}`
+                        ? ` · ${fmtDate(lead.source_msg_date)}`
                         : null}
                     </div>
                   </div>

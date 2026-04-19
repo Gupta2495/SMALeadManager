@@ -118,7 +118,7 @@ export default async function LeadsListPage({
                     <StatusChip status={lead.status} />
                   </td>
                   <td className="muted">
-                    {fmtDate(lead.captured_at, { relative: true, noYear: true })}
+                    {fmtDate(lead.captured_at, { relative: true })}
                   </td>
                 </tr>
               ))}
