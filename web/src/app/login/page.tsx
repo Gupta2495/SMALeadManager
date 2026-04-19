@@ -18,15 +18,16 @@ export default async function LoginPage({
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6">
-      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-semibold text-zinc-900">
-          Shree Madhav Lead Tracker
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          Sign in with your admissions account.
-        </p>
+    <main className="login-page">
+      <div className="login-card">
+        <div className="brand-mark">SMA</div>
+        <h1>Madhav Leads</h1>
+        <p>Admissions lead tracker for Shree Madhav Academy.</p>
         <LoginForm next={next} initialError={error} />
+        <div className="foot">
+          Trouble signing in? Ask the admin to reset your password from the
+          Supabase dashboard.
+        </div>
       </div>
     </main>
   );

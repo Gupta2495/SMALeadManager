@@ -34,36 +34,34 @@ export function LoginForm({
   }
 
   return (
-    <form action={onSubmit} className="mt-5 flex flex-col gap-3">
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="text-zinc-700">Email</span>
+    <form action={onSubmit}>
+      <div>
+        <label className="label" htmlFor="email">Email</label>
         <input
+          id="email"
           type="email"
           name="email"
           required
           autoComplete="email"
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900"
+          className="input"
         />
-      </label>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="text-zinc-700">Password</span>
+      </div>
+      <div>
+        <label className="label" htmlFor="password">Password</label>
         <input
+          id="password"
           type="password"
           name="password"
           required
           autoComplete="current-password"
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900"
+          className="input"
         />
-      </label>
-      {error ? (
-        <p role="alert" className="text-sm text-red-700">
-          {error}
-        </p>
-      ) : null}
+      </div>
+      {error ? <p role="alert" className="form-error">{error}</p> : null}
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+        className="btn btn-primary btn-lg btn-block"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>
