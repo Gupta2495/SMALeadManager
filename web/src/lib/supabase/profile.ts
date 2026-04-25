@@ -1,13 +1,11 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "./server";
 import type { Profile } from "@/lib/types";
 
-/**
- * Fetches the signed-in user + their profiles row. Redirects to /login if
- * the session is missing (middleware usually catches this first, but a
- * defensive check keeps server components simple).
- */
-export async function getCurrentProfile() {
+// cache() deduplicates calls within the same React render tree, so layout +
+// page both calling this only hits Supabase once per request.
+export const getCurrentProfile = cache(async function getCurrentProfile() {
   const supabase = await createClient();
 
   const {
@@ -22,4 +20,4 @@ export async function getCurrentProfile() {
     .single<Profile>();
 
   return { supabase, user, profile };
-}
+});

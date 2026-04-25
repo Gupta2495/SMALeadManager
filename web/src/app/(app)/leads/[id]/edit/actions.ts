@@ -48,7 +48,10 @@ export async function editLeadAction(
 
   if (error) {
     if (error.code === "23505") {
-      return { ok: false, error: "Another lead already uses this phone number." };
+      return {
+        ok: false,
+        error: "Could not save this lead because the database still has a unique-number constraint.",
+      };
     }
     return { ok: false, error: error.message };
   }

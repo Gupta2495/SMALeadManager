@@ -6,6 +6,7 @@ export type Role = "admin" | "caller";
 
 export const LEAD_STATUSES = [
   "new",
+  "to_be_contacted",
   "contacted",
   "interested",
   "visited",
@@ -51,8 +52,9 @@ export const INTERESTS = [
 export type StatusMeta = { label: string; bg: string; fg: string; filled: boolean };
 
 export const STATUS_META: Record<LeadStatus, StatusMeta> = {
-  new:        { label: "New",        bg: "#DBEAFE", fg: "#1E40AF", filled: false },
-  contacted:  { label: "Contacted",  bg: "#EDE9FE", fg: "#6D28D9", filled: false },
+  new:              { label: "New",              bg: "#DBEAFE", fg: "#1E40AF", filled: false },
+  to_be_contacted:  { label: "To be contacted",  bg: "#FEF3C7", fg: "#92400E", filled: false },
+  contacted:        { label: "Contacted",        bg: "#EDE9FE", fg: "#6D28D9", filled: false },
   interested: { label: "Interested", bg: "#D1FAE5", fg: "#047857", filled: false },
   visited:    { label: "Visited",    bg: "#CCFBF1", fg: "#0F766E", filled: false },
   on_hold:    { label: "On hold",    bg: "#E5E7EB", fg: "#4B5563", filled: false },

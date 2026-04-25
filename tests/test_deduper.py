@@ -15,10 +15,10 @@ def make(lead_id, phone="", parent="", student="", tab="Leads"):
     )
 
 
-def test_phone_match():
+def test_same_phone_is_not_a_duplicate_by_itself():
     d = Deduper([make("L1", phone="+919876500001", parent="Ramesh", student="Aarav")])
-    r = d.check("+919876500001", None, None)
-    assert r.is_duplicate and r.match.lead_id == "L1"
+    r = d.check("+919876500001", "Suresh", "Vihaan")
+    assert not r.is_duplicate
 
 
 def test_name_match_case_insensitive():
@@ -28,8 +28,8 @@ def test_name_match_case_insensitive():
 
 
 def test_cross_tab_review_also_dedupes():
-    d = Deduper([make("L2", phone="+919876500002", tab="Review")])
-    r = d.check("+919876500002", None, None)
+    d = Deduper([make("L2", phone="+919876500002", parent="Sunita", student="Kavya", tab="Review")])
+    r = d.check("+919876500002", "Sunita", "Kavya")
     assert r.is_duplicate and r.match.tab == "Review"
 
 
@@ -41,8 +41,8 @@ def test_no_match():
 
 def test_register_updates_index():
     d = Deduper([])
-    d.register(make("L1", phone="+919876500001"))
-    assert d.check("+919876500001", None, None).is_duplicate
+    d.register(make("L1", phone="+919876500001", parent="Ramesh", student="Aarav"))
+    assert d.check("+919876500001", "Ramesh", "Aarav").is_duplicate
 
 
 def test_name_match_requires_both_names():

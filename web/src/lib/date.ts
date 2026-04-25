@@ -56,6 +56,15 @@ export function daysBetween(a: Date | string, b: Date | string): number {
   return Math.round(ms / (1000 * 60 * 60 * 24));
 }
 
+export function isOlderThanDays(
+  iso: string | null | undefined,
+  days: number,
+  now: Date = new Date(),
+): boolean {
+  if (!iso) return false;
+  return daysBetween(now, iso) > days;
+}
+
 export type FollowUpState =
   | { kind: "overdue"; days: number; label: string }
   | { kind: "due"; label: string }

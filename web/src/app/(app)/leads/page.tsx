@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { StatusChip } from "@/components/StatusChip";
+import { DeleteLeadButton } from "@/components/DeleteLeadButton";
+import { LeadRow } from "@/components/LeadRow";
+import { QuickStatusSelect } from "@/components/QuickStatusSelect";
 import { fmtDate } from "@/lib/date";
 import { formatPhoneDisplay } from "@/lib/phoneFormat";
 import { getCurrentProfile } from "@/lib/supabase/profile";
@@ -7,7 +9,7 @@ import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/types";
 
 export const metadata = { title: "All leads · Madhav Leads" };
 
-type SP = Promise<{ q?: string; status?: string }>;
+type SP = Promise<{ q?: string; status?: string; sort?: string; dir?: string }>;
 
 export default async function LeadsListPage({
   searchParams,
@@ -15,12 +17,11 @@ export default async function LeadsListPage({
   searchParams: SP;
 }) {
   const { supabase } = await getCurrentProfile();
-  const { q, status } = await searchParams;
+  const { q, status, sort: sortCol, dir: sortDir } = await searchParams;
 
   let query = supabase
     .from("leads")
     .select("*")
-    .order("captured_at", { ascending: false })
     .limit(200);
 
   if (status && (LEAD_STATUSES as readonly string[]).includes(status)) {
@@ -33,8 +34,30 @@ export default async function LeadsListPage({
     );
   }
 
+  if (sortCol === "class") {
+    query = query.order("class_label", { ascending: sortDir !== "desc", nullsFirst: false });
+  } else if (sortCol === "source") {
+    query = query.order("source_msg_date", { ascending: sortDir !== "desc", nullsFirst: false });
+  } else {
+    query = query.order("captured_at", { ascending: false });
+  }
+
   const { data: leads } = await query.returns<Lead[]>();
   const rows = leads ?? [];
+
+  function thHref(col: string) {
+    const p = new URLSearchParams();
+    if (q) p.set("q", q);
+    if (status) p.set("status", status);
+    p.set("sort", col);
+    p.set("dir", sortCol === col && sortDir !== "desc" ? "desc" : "asc");
+    return `/leads?${p.toString()}`;
+  }
+
+  function thArrow(col: string) {
+    if (sortCol !== col) return null;
+    return sortDir === "desc" ? " ↓" : " ↑";
+  }
 
   return (
     <>
@@ -94,19 +117,26 @@ export default async function LeadsListPage({
               <tr>
                 <th>Student</th>
                 <th>Parent</th>
-                <th>Class</th>
+                <th>
+                  <Link href={thHref("class")} className={`th-sort${sortCol === "class" ? " th-sort-active" : ""}`}>
+                    Class{thArrow("class")}
+                  </Link>
+                </th>
                 <th>Phone</th>
                 <th>Status</th>
-                <th>Captured</th>
+                <th>Actions</th>
+                <th>
+                  <Link href={thHref("source")} className={`th-sort${sortCol === "source" ? " th-sort-active" : ""}`}>
+                    Source{thArrow("source")}
+                  </Link>
+                </th>
               </tr>
             </thead>
             <tbody>
               {rows.map((lead) => (
-                <tr key={lead.id}>
+                <LeadRow key={lead.id} leadId={lead.id}>
                   <td>
-                    <Link href={`/leads/${lead.id}`} className="student">
-                      {lead.student_name ?? "—"}
-                    </Link>
+                    <span className="student">{lead.student_name ?? "—"}</span>
                     {lead.location ? (
                       <div className="muted">{lead.location}</div>
                     ) : null}
@@ -115,12 +145,15 @@ export default async function LeadsListPage({
                   <td>{lead.class_label ?? "—"}</td>
                   <td>{formatPhoneDisplay(lead.phone)}</td>
                   <td>
-                    <StatusChip status={lead.status} />
+                    <QuickStatusSelect leadId={lead.id} initial={lead.status} />
+                  </td>
+                  <td>
+                    <DeleteLeadButton leadId={lead.id} />
                   </td>
                   <td className="muted">
-                    {fmtDate(lead.captured_at, { relative: true })}
+                    {fmtDate(lead.source_msg_date ?? lead.captured_at, { relative: true })}
                   </td>
-                </tr>
+                </LeadRow>
               ))}
             </tbody>
           </table>

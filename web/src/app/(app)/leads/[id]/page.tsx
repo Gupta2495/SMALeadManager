@@ -1,12 +1,25 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronRight, MessageCircle, Pencil, Phone } from "lucide-react";
+import { DeleteLeadButton } from "@/components/DeleteLeadButton";
 import { fmtDate, fmtTime, followUpState } from "@/lib/date";
 import { formatPhoneDisplay, telHref, whatsappHref } from "@/lib/phoneFormat";
 import { getCurrentProfile } from "@/lib/supabase/profile";
-import { OUTCOME_LABELS, type Interaction, type Lead } from "@/lib/types";
+import { OUTCOME_LABELS, type Lead } from "@/lib/types";
 import { StatusSelect } from "./status-select";
 import { CallLogForm } from "./call-log-form";
+
+type InteractionHistory = {
+  id: string;
+  type: string;
+  outcome: keyof typeof OUTCOME_LABELS | null;
+  notes: string | null;
+  created_at: string;
+  creator: {
+    full_name: string | null;
+    email: string | null;
+  } | null;
+};
 
 export default async function LeadDetailPage({
   params,
@@ -20,10 +33,10 @@ export default async function LeadDetailPage({
     supabase.from("leads").select("*").eq("id", id).single<Lead>(),
     supabase
       .from("interactions")
-      .select("*")
+      .select("id, type, outcome, notes, created_at, creator:profiles!interactions_created_by_fkey(full_name, email)")
       .eq("lead_id", id)
       .order("created_at", { ascending: false })
-      .returns<Interaction[]>(),
+      .returns<InteractionHistory[]>(),
   ]);
 
   if (!lead) notFound();
@@ -46,9 +59,12 @@ export default async function LeadDetailPage({
                 {lead.parent_name ?? "—"} · {formatPhoneDisplay(lead.phone)}
               </div>
             </div>
-            <Link href={`/leads/${lead.id}/edit`} className="btn btn-secondary" style={{ flexShrink: 0 }}>
-              <Pencil size={15} aria-hidden /> Edit
-            </Link>
+            <div className="btn-row">
+              <Link href={`/leads/${lead.id}/edit`} className="btn btn-secondary btn-sm">
+                <Pencil size={15} aria-hidden /> Edit
+              </Link>
+              <DeleteLeadButton leadId={lead.id} redirectTo="/leads" />
+            </div>
           </div>
 
           <div className="detail-actions">
@@ -112,7 +128,7 @@ export default async function LeadDetailPage({
                   <MessageCircle size={14} aria-hidden />
                   {lead.source_from ?? "—"}
                   {lead.source_msg_date
-                    ? ` · ${fmtDate(lead.source_msg_date)} at ${fmtTime(lead.source_msg_date)}`
+                    ? ` · ${fmtDate(lead.source_msg_date)}`
                     : null}
                 </div>
                 &ldquo;{lead.source_message}&rdquo;
@@ -144,6 +160,9 @@ export default async function LeadDetailPage({
                       </span>
                     </div>
                     {h.notes ? <div className="notes">{h.notes}</div> : null}
+                    <div className="by">
+                      Logged by {h.creator?.full_name ?? h.creator?.email ?? "Unknown"}
+                    </div>
                   </div>
                 </div>
               ))

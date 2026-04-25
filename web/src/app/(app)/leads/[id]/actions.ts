@@ -18,6 +18,7 @@ export async function updateStatusAction(
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/leads/${leadId}`);
   revalidatePath("/");
+  revalidatePath("/leads");
   return { ok: true };
 }
 
@@ -39,24 +40,26 @@ export async function logCallAction(input: LogCallInput): Promise<Result> {
   const { supabase, user } = await getCurrentProfile();
   const nowIso = new Date().toISOString();
 
-  const { data: existing, error: readErr } = await supabase
-    .from("leads")
-    .select("follow_up_count, status")
-    .eq("id", input.leadId)
-    .single<{ follow_up_count: number; status: LeadStatus }>();
-  if (readErr || !existing) {
-    return { ok: false, error: readErr?.message ?? "Lead not found" };
-  }
+  // Read the current lead state and write the interaction in parallel —
+  // neither depends on the other's result.
+  const [{ data: existing, error: readErr }, { error: insertErr }] = await Promise.all([
+    supabase
+      .from("leads")
+      .select("follow_up_count, status")
+      .eq("id", input.leadId)
+      .single<{ follow_up_count: number; status: LeadStatus }>(),
+    supabase.from("interactions").insert({
+      lead_id: input.leadId,
+      type: "call",
+      outcome: input.outcome,
+      channel: "call",
+      notes: input.notes || null,
+      next_follow_up: input.nextFollowUp,
+      created_by: user.id,
+    }),
+  ]);
 
-  const { error: insertErr } = await supabase.from("interactions").insert({
-    lead_id: input.leadId,
-    type: "call",
-    outcome: input.outcome,
-    channel: "call",
-    notes: input.notes || null,
-    next_follow_up: input.nextFollowUp,
-    created_by: user.id,
-  });
+  if (readErr || !existing) return { ok: false, error: readErr?.message ?? "Lead not found" };
   if (insertErr) return { ok: false, error: insertErr.message };
 
   const patch: Record<string, unknown> = {
@@ -76,6 +79,7 @@ export async function logCallAction(input: LogCallInput): Promise<Result> {
 
   revalidatePath(`/leads/${input.leadId}`);
   revalidatePath("/");
+  revalidatePath("/leads");
   return { ok: true };
 }
 
@@ -91,5 +95,6 @@ export async function closeLeadAction(
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/leads/${leadId}`);
   revalidatePath("/");
+  revalidatePath("/leads");
   return { ok: true };
 }

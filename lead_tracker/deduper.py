@@ -26,11 +26,8 @@ class DedupeResult:
 
 class Deduper:
     def __init__(self, existing: Iterable[ExistingLead]) -> None:
-        self._by_phone: dict[str, ExistingLead] = {}
         self._by_names: dict[tuple[str, str], ExistingLead] = {}
         for lead in existing:
-            if lead.phone:
-                self._by_phone[lead.phone] = lead
             parent_k = name_key(lead.parent_name)
             student_k = name_key(lead.student_name)
             if parent_k and student_k:
@@ -42,10 +39,6 @@ class Deduper:
         parent_name: str | None,
         student_name: str | None,
     ) -> DedupeResult:
-        if phone:
-            hit = self._by_phone.get(phone)
-            if hit is not None:
-                return DedupeResult(True, hit, f"phone match: {phone}")
         parent_k = name_key(parent_name or "")
         student_k = name_key(student_name or "")
         if parent_k and student_k:
@@ -57,8 +50,6 @@ class Deduper:
         return DedupeResult(False)
 
     def register(self, lead: ExistingLead) -> None:
-        if lead.phone:
-            self._by_phone[lead.phone] = lead
         parent_k = name_key(lead.parent_name)
         student_k = name_key(lead.student_name)
         if parent_k and student_k:

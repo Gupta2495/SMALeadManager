@@ -16,6 +16,7 @@ create type user_role as enum ('admin', 'caller');
 
 create type lead_status as enum (
   'new',
+  'to_be_contacted',
   'contacted',
   'interested',
   'visited',
@@ -58,7 +59,7 @@ create table profiles (
 create table leads (
   id                uuid primary key default uuid_generate_v4(),
   lead_id           text unique,                          -- human code: LEAD-YYYYMMDD-NNN
-  phone             text unique not null,                 -- normalized E.164-ish
+  phone             text not null,                        -- normalized E.164-ish; may be shared across leads
   parent_name       text,
   student_name      text,
   class_label       text,                                 -- Nursery | LKG | UKG | 1..12

@@ -68,6 +68,16 @@ export function NewLeadForm() {
         <input id="location" name="location" className="input" />
       </div>
       <div className="form-row">
+        <label className="label" htmlFor="source_msg_date">Source date</label>
+        <input
+          id="source_msg_date"
+          name="source_msg_date"
+          type="date"
+          className="input"
+        />
+        <p className="hint">Optional — add the original source date for manual entries.</p>
+      </div>
+      <div className="form-row">
         <label className="label" htmlFor="notes">Notes</label>
         <textarea id="notes" name="notes" className="textarea" />
       </div>

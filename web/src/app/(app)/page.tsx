@@ -1,11 +1,10 @@
+import Link from "next/link";
 import { LeadCard } from "@/components/LeadCard";
-import { followUpState } from "@/lib/date";
+import { followUpState, isOlderThanDays } from "@/lib/date";
 import { getCurrentProfile } from "@/lib/supabase/profile";
 import type { Lead } from "@/lib/types";
 
 export const metadata = { title: "Today · Madhav Leads" };
-
-const CLOSED_STATUSES = ["admitted", "lost", "rejected", "on_hold"] as const;
 
 export default async function DashboardPage() {
   const { supabase, user } = await getCurrentProfile();
@@ -13,11 +12,23 @@ export default async function DashboardPage() {
   const { data: leads } = await supabase
     .from("leads")
     .select("*")
+    .not("status", "in", "(admitted,lost,rejected,on_hold)")
     .order("captured_at", { ascending: false })
     .returns<Lead[]>();
 
-  const { overdue, dueToday, newLeads } = splitLeads(leads ?? []);
-  const totalToCall = overdue.length + dueToday.length;
+  const rows = leads ?? [];
+  const staleNewLeadIds = rows
+    .filter((lead) => lead.status === "new" && isOlderThanDays(lead.captured_at, 7))
+    .map((lead) => lead.id);
+
+  if (staleNewLeadIds.length > 0) {
+    await supabase
+      .from("leads")
+      .update({ status: "to_be_contacted" })
+      .in("id", staleNewLeadIds);
+  }
+
+  const { followUps, newLeads, toBeContacted } = splitLeads(rows);
   const displayName = user.email?.split("@")[0] ?? "there";
 
   return (
@@ -27,30 +38,33 @@ export default async function DashboardPage() {
           <h1 className="page-title">Good morning, {displayName}</h1>
           <div className="summary-strip">
             <span>
-              <strong>{totalToCall}</strong> calls to make today
+              <strong>{followUps.length}</strong> follow-ups today
             </span>
-            {overdue.length > 0 ? (
-              <span className="pill red">{overdue.length} overdue</span>
-            ) : null}
             {newLeads.length > 0 ? (
               <span className="pill blue">{newLeads.length} new</span>
             ) : null}
+            {toBeContacted.length > 0 ? (
+              <span className="pill amber">{toBeContacted.length} to contact</span>
+            ) : null}
           </div>
         </div>
+        <Link href="/leads/new" className="btn btn-primary">
+          + New lead
+        </Link>
       </div>
 
-      {overdue.length > 0 ? (
-        <Section label="Overdue" variant="overdue" items={overdue} />
-      ) : null}
-      {dueToday.length > 0 ? (
-        <Section label="Due today" variant="due" items={dueToday} />
+      {followUps.length > 0 ? (
+        <Section label="Follow ups today" variant="due" items={followUps} />
       ) : null}
       <Section
         label="New leads"
         variant="new"
         items={newLeads}
-        emptyMessage="No new leads today."
+        emptyMessage="No new leads."
       />
+      {toBeContacted.length > 0 ? (
+        <Section label="To be contacted" variant="to_be_contacted" items={toBeContacted} />
+      ) : null}
     </>
   );
 }
@@ -62,7 +76,7 @@ function Section({
   emptyMessage,
 }: {
   label: string;
-  variant: "overdue" | "due" | "new";
+  variant: "overdue" | "due" | "new" | "to_be_contacted";
   items: Lead[];
   emptyMessage?: string;
 }) {
@@ -89,33 +103,44 @@ function Section({
 }
 
 function splitLeads(leads: Lead[]): {
-  overdue: Lead[];
-  dueToday: Lead[];
+  followUps: Lead[];
   newLeads: Lead[];
+  toBeContacted: Lead[];
 } {
-  const overdue: Lead[] = [];
-  const dueToday: Lead[] = [];
+  const followUps: Lead[] = [];
   const newLeads: Lead[] = [];
+  const toBeContacted: Lead[] = [];
 
   for (const lead of leads) {
-    if (CLOSED_STATUSES.includes(lead.status as (typeof CLOSED_STATUSES)[number])) {
-      continue;
-    }
     const state = followUpState(lead.next_follow_up);
-    if (state?.kind === "overdue") {
-      overdue.push(lead);
-    } else if (state?.kind === "due") {
-      dueToday.push(lead);
+    if (state?.kind === "overdue" || state?.kind === "due") {
+      followUps.push(lead);
     } else if (lead.status === "new") {
-      newLeads.push(lead);
+      if (isOlderThanDays(lead.captured_at, 7)) toBeContacted.push(lead);
+      else newLeads.push(lead);
+    } else if (lead.status === "to_be_contacted") {
+      toBeContacted.push(lead);
     }
   }
 
-  overdue.sort(
+  // Oldest overdue first, then by follow-up date
+  followUps.sort(
     (a, b) =>
       new Date(a.next_follow_up ?? 0).getTime() -
       new Date(b.next_follow_up ?? 0).getTime(),
   );
 
-  return { overdue, dueToday, newLeads };
+  // Oldest captured first (longest waiting)
+  newLeads.sort(
+    (a, b) =>
+      new Date(a.captured_at).getTime() - new Date(b.captured_at).getTime(),
+  );
+
+  // Same — oldest first so longest-waiting surfaces at top
+  toBeContacted.sort(
+    (a, b) =>
+      new Date(a.captured_at).getTime() - new Date(b.captured_at).getTime(),
+  );
+
+  return { followUps, newLeads, toBeContacted };
 }
