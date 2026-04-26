@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhatsAppImportModal } from "./WhatsAppImportModal";
 import { DeleteLeadButton } from "@/components/DeleteLeadButton";
 import { LeadRow } from "@/components/LeadRow";
 import { QuickStatusSelect } from "@/components/QuickStatusSelect";
@@ -66,9 +67,12 @@ export default async function LeadsListPage({
           <h1 className="page-title">All leads</h1>
           <p className="page-sub">Search and filter across every captured lead.</p>
         </div>
-        <Link href="/leads/new" className="btn btn-primary">
-          + New lead
-        </Link>
+        <div style={{ display: "flex", gap: 8 }}>
+          <WhatsAppImportModal />
+          <Link href="/leads/new" className="btn btn-primary">
+            + New lead
+          </Link>
+        </div>
       </div>
 
       <form method="get" className="toolbar">

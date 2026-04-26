@@ -423,3 +423,84 @@ table.leads-table { width: 100%; border-collapse: collapse; }
   outline-offset: 2px;
   border-radius: 6px;
 }
+
+/* ==================================================================
+ * Mobile responsiveness
+ * Targets phones (<640px). Tablets/desktop (>=1024px) already have
+ * dedicated rules above; this block fixes layouts that broke on
+ * narrow screens.
+ * ================================================================== */
+@media (max-width: 639px) {
+  /* Topnav: tighter spacing, hide the academy subtitle so the brand +
+     user menu fit on a 360px screen. */
+  .topnav { padding: 0 14px; gap: 12px; height: 56px; }
+  .brand { font-size: 15px; gap: 8px; }
+  .brand-mark { width: 28px; height: 28px; font-size: 13px; }
+  .brand-sub { display: none; }
+  .user-menu { padding: 4px 10px 4px 4px; gap: 6px; font-size: 12px; }
+  .user-menu .user-avatar { width: 24px; height: 24px; }
+  .user-menu > span:not(.user-avatar) { max-width: 80px !important; }
+
+  /* Page padding tightens; bottom padding still leaves room above the
+     fixed bottom-tab bar. */
+  .page { padding: 16px 14px 96px; }
+  .page-header { gap: 10px; }
+  .page-title { font-size: 24px; }
+  .detail-title { font-size: 24px; }
+
+  /* Leads table — scroll horizontally and don't wrap cells, otherwise
+     the table becomes unreadable. */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .leads-table { min-width: 720px; }
+  .leads-table thead th,
+  .leads-table td { white-space: nowrap; padding: 12px 12px; }
+  .leads-table td .student { white-space: normal; }
+  .leads-table td .muted { white-space: nowrap; }
+
+  /* Toolbar: drop search min-width so it shares the row gracefully. */
+  .toolbar { padding: 10px; gap: 6px; }
+  .toolbar .search-wrap { min-width: 0; flex: 1 1 100%; }
+  .toolbar .select { width: 100%; min-width: 0; flex: 1; }
+
+  /* Modal: less padding so content gets more usable width. */
+  .modal-backdrop { padding: 12px; align-items: flex-end; }
+  .modal { padding: 20px; border-radius: 14px; max-height: 92vh; }
+  .modal-header { margin-bottom: 14px; }
+  .modal-actions { flex-wrap: wrap; }
+  .modal-actions .btn { flex: 1; min-width: 0; }
+
+  /* Detail page: stack the title row and switch info-grid to a single
+     column for legibility. */
+  .info-grid { grid-template-columns: 1fr; gap: 12px; padding: 14px 0; }
+  .detail-actions { grid-template-columns: 1fr; }
+  .detail-actions .btn { width: 100%; }
+
+  /* Review queue: tighter padding, action buttons stretch full-width. */
+  .review-row { padding: 14px; }
+  .review-fields { grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+  .review-actions .btn { flex: 1; }
+
+  /* Buttons: prevent the "+ New lead" / "Import WhatsApp" pair from
+     overflowing the page-header — let them wrap and stretch. */
+  .page-header > div:last-child { width: 100%; }
+  .page-header > div:last-child .btn { flex: 1; }
+
+  /* Lead cards: single-column status chip placement reads better than
+     the cramped 1fr/auto split. */
+  .lead-card { grid-template-columns: 1fr; gap: 8px; }
+  .lead-caret { display: none; }
+
+  /* Login card padding shrinks. */
+  .login-card { padding: 28px 22px; }
+
+  /* Form rows: avoid horizontal scroll when label + chip stack. */
+  .form-row-inline { flex-wrap: wrap; }
+}
+
+/* Tablet tightening: keep desktop layout but shrink padding so the
+   leads table doesn't push out of the viewport on iPads in portrait. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .page { padding: 24px 24px 32px; }
+  .table-wrap { overflow-x: auto; }
+  .leads-table { min-width: 720px; }
+}

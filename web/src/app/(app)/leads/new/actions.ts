@@ -2,12 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/lib/supabase/profile";
+import { adminClient } from "@/lib/supabase/admin";
 import { normalizePhone } from "@/lib/phoneFormat";
 
 type Result = { ok: true; leadId: string } | { ok: false; error: string };
 
 export async function createLeadAction(formData: FormData): Promise<Result> {
-  const { supabase, user } = await getCurrentProfile();
+  const { user } = await getCurrentProfile();
+  const supabase = adminClient();
 
   const rawPhone = String(formData.get("phone") ?? "");
   const phone = normalizePhone(rawPhone);

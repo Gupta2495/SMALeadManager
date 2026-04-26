@@ -130,10 +130,12 @@ function splitLeads(leads: Lead[]): {
       new Date(b.next_follow_up ?? 0).getTime(),
   );
 
-  // Oldest captured first (longest waiting)
+  // Newest source date first — most recent enquiries surface at top.
+  // Falls back to captured_at when source_msg_date is missing.
   newLeads.sort(
     (a, b) =>
-      new Date(a.captured_at).getTime() - new Date(b.captured_at).getTime(),
+      new Date(b.source_msg_date ?? b.captured_at).getTime() -
+      new Date(a.source_msg_date ?? a.captured_at).getTime(),
   );
 
   // Same — oldest first so longest-waiting surfaces at top

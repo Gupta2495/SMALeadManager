@@ -6,15 +6,12 @@ import { BarChart3, LayoutDashboard, List, ShieldAlert, User } from "lucide-reac
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-import type { Role } from "@/lib/types";
-
 type Props = {
   userEmail: string | null;
-  role: Role;
   reviewCount?: number;
 };
 
-export function TopNav({ userEmail, role, reviewCount = 0 }: Props) {
+export function TopNav({ userEmail, reviewCount = 0 }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
@@ -50,12 +47,10 @@ export function TopNav({ userEmail, role, reviewCount = 0 }: Props) {
         <Link href="/analytics" className={cn("nav-link", isActive("/analytics") && "active")}>
           <BarChart3 size={16} aria-hidden /> Analytics
         </Link>
-        {role === "admin" ? (
-          <Link href="/review" className={cn("nav-link", isActive("/review") && "active")}>
-            <ShieldAlert size={16} aria-hidden /> Review
-            {reviewCount > 0 ? <span className="count-pill">{reviewCount}</span> : null}
-          </Link>
-        ) : null}
+        <Link href="/review" className={cn("nav-link", isActive("/review") && "active")}>
+          <ShieldAlert size={16} aria-hidden /> Review
+          {reviewCount > 0 ? <span className="count-pill">{reviewCount}</span> : null}
+        </Link>
       </nav>
 
       <div className="nav-spacer" />

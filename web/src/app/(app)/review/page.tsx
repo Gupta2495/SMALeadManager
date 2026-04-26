@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getCurrentProfile } from "@/lib/supabase/profile";
 import type { Lead } from "@/lib/types";
@@ -9,8 +8,7 @@ import { ReviewActions } from "./review-actions";
 export const metadata = { title: "Review · Madhav Leads" };
 
 export default async function ReviewPage() {
-  const { supabase, profile } = await getCurrentProfile();
-  if (profile?.role !== "admin") notFound();
+  const { supabase } = await getCurrentProfile();
 
   const { data: leads } = await supabase
     .from("leads")
