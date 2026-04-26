@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { BarChart3, LayoutDashboard, List, ShieldAlert, User } from "lucide-react";
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+
 type Props = {
   userEmail: string | null;
   reviewCount?: number;
@@ -13,19 +12,9 @@ type Props = {
 
 export function TopNav({ userEmail, reviewCount = 0 }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [signingOut, setSigningOut] = useState(false);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
-
-  async function onSignOut() {
-    setSigningOut(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.replace("/login");
-    router.refresh();
-  }
 
   return (
     <header className="topnav">
@@ -55,14 +44,16 @@ export function TopNav({ userEmail, reviewCount = 0 }: Props) {
 
       <div className="nav-spacer" />
 
-      <button type="button" className="user-menu" onClick={onSignOut} disabled={signingOut}>
+      <Link
+        href="/profile"
+        className={cn("user-menu", isActive("/profile") && "active")}
+        aria-label="Profile"
+      >
         <span className="user-avatar">
           <User size={14} aria-hidden />
         </span>
-        <span className="max-w-[160px] truncate">
-          {signingOut ? "Signing out…" : userEmail ?? "Guest"}
-        </span>
-      </button>
+        <span className="max-w-[160px] truncate">{userEmail ?? "Guest"}</span>
+      </Link>
     </header>
   );
 }

@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Home, List, User } from "lucide-react";
+import { BarChart3, Home, List, ShieldAlert, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function BottomNav() {
+type Props = {
+  reviewCount?: number;
+};
+
+export function BottomNav({ reviewCount = 0 }: Props) {
   const pathname = usePathname();
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -19,6 +23,13 @@ export function BottomNav() {
       <Link href="/leads" className={cn("bottom-tab", isActive("/leads") && "active")}>
         <List aria-hidden />
         <span>Leads</span>
+      </Link>
+      <Link href="/review" className={cn("bottom-tab", isActive("/review") && "active")}>
+        <span className="bottom-tab-icon">
+          <ShieldAlert aria-hidden />
+          {reviewCount > 0 ? <span className="bottom-tab-badge">{reviewCount}</span> : null}
+        </span>
+        <span>Review</span>
       </Link>
       <Link href="/analytics" className={cn("bottom-tab", isActive("/analytics") && "active")}>
         <BarChart3 aria-hidden />

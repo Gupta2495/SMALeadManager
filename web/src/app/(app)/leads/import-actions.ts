@@ -115,10 +115,10 @@ export async function importWhatsAppLeadsAction(
       class_label: raw.class_label?.trim() || null,
       location: raw.location?.trim() || null,
       notes: raw.notes?.trim() || null,
-      source_from: raw.source_from?.trim() || null,
+      source_from: raw.source_from?.trim() || "bulk_import",
       source_msg_date,
       status: "new",
-      assigned_to: user.id,
+      assigned_to: null,  // Leave unassigned so all callers can see and claim them
       captured_at: now,
       confidence: 0.8,
       needs_review: true,

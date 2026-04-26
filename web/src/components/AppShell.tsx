@@ -12,7 +12,7 @@ export function AppShell({ userEmail, reviewCount, children }: Props) {
     <div className="app">
       <TopNav userEmail={userEmail} reviewCount={reviewCount} />
       <div className="page">{children}</div>
-      <BottomNav />
+      <BottomNav reviewCount={reviewCount} />
     </div>
   );
 }
