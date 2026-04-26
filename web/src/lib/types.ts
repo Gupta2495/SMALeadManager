@@ -4,6 +4,11 @@
 
 export type Role = "admin" | "caller";
 
+/** Shared return type for all server actions. */
+export type ActionResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
 export const LEAD_STATUSES = [
   "new",
   "to_be_contacted",

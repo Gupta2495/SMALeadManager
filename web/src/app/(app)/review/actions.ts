@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/lib/supabase/profile";
 import { adminClient } from "@/lib/supabase/admin";
+import type { ActionResult } from "@/lib/types";
 
-type Result = { ok: true } | { ok: false; error: string };
+type Result = ActionResult;
 
 export async function promoteFromReviewAction(leadId: string): Promise<Result> {
   await getCurrentProfile(); // verify authenticated

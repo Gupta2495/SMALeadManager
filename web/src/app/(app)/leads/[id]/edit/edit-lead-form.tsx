@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { editLeadAction } from "./actions";
-import { INTERESTS, type Lead } from "@/lib/types";
+import { INTERESTS, CLASSES, type Lead } from "@/lib/types";
 
 export function EditLeadForm({ lead }: { lead: Lead }) {
   const router = useRouter();
@@ -78,7 +78,7 @@ export function EditLeadForm({ lead }: { lead: Lead }) {
           list="class-options"
         />
         <datalist id="class-options">
-          {["Nursery","LKG","UKG","1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th"].map((c) => (
+          {CLASSES.map((c) => (
             <option key={c} value={c} />
           ))}
         </datalist>

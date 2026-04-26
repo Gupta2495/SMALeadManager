@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/lib/supabase/profile";
-import type { CallOutcome, LeadStatus } from "@/lib/types";
+import type { ActionResult, CallOutcome, LeadStatus } from "@/lib/types";
 
-type Result = { ok: true } | { ok: false; error: string };
+type Result = ActionResult;
 
 export async function updateStatusAction(
   leadId: string,

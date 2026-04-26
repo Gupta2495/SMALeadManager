@@ -38,8 +38,8 @@ export async function importWhatsAppLeadsAction(
   jsonString: string,
 ): Promise<ImportResult> {
   // Verify authentication first; the actual insert uses the service-role
-  // client because callers don't have an INSERT policy on leads.
-  const { user } = await getCurrentProfile();
+  // client because it needs admin-level access.
+  await getCurrentProfile();
   const supabase = adminClient();
 
   let parsed: unknown;

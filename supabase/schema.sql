@@ -181,63 +181,18 @@ create policy "profiles: admin update" on profiles
     exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
   );
 
--- leads: admin full access
-create policy "leads: admin all" on leads
+-- leads: all authenticated users have full CRUD access
+-- (role-based distinction only applies to user management in profile/actions.ts)
+create policy "leads: caller all" on leads
   for all
-  using (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
-  )
-  with check (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
-  );
+  using (true)
+  with check (true);
 
--- leads: callers see their assigned leads + unclaimed leads
-create policy "leads: caller select own or unclaimed" on leads
-  for select
-  using (
-    assigned_to = auth.uid() or assigned_to is null
-  );
-
--- leads: callers update their assigned leads or claim unassigned ones
-create policy "leads: caller update own or unclaimed" on leads
-  for update
-  using (
-    assigned_to = auth.uid() or assigned_to is null
-  )
-  with check (
-    assigned_to = auth.uid() or assigned_to is null
-  );
-
--- interactions: admin all
-create policy "interactions: admin all" on interactions
+-- interactions: all authenticated users have full CRUD access
+create policy "interactions: caller all" on interactions
   for all
-  using (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
-  )
-  with check (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
-  );
-
--- interactions: callers read+write for leads they can see
-create policy "interactions: caller select for visible leads" on interactions
-  for select
-  using (
-    exists (
-      select 1 from leads l
-      where l.id = interactions.lead_id
-        and (l.assigned_to = auth.uid() or l.assigned_to is null)
-    )
-  );
-
-create policy "interactions: caller insert for visible leads" on interactions
-  for insert
-  with check (
-    exists (
-      select 1 from leads l
-      where l.id = interactions.lead_id
-        and (l.assigned_to = auth.uid() or l.assigned_to is null)
-    )
-  );
+  using (true)
+  with check (true);
 
 -- raw_messages: service-role only (Python ingester). No policy → no access
 -- for regular users. The service-role key bypasses RLS entirely.

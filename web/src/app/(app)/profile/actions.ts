@@ -3,9 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/lib/supabase/profile";
 import { adminClient } from "@/lib/supabase/admin";
-import type { Role } from "@/lib/types";
+import type { ActionResult, Role } from "@/lib/types";
 
-type Result = { ok: true } | { ok: false; error: string };
+type Result = ActionResult;
 
 interface CreateUserInput {
   email: string;
@@ -15,7 +15,7 @@ interface CreateUserInput {
 }
 
 export async function createUserAction(input: CreateUserInput): Promise<Result> {
-  // Only admins can create users.
+  // Only admins can create users — keep this gate.
   const { profile } = await getCurrentProfile();
   if (profile?.role !== "admin") {
     return { ok: false, error: "Only admins can create users." };
