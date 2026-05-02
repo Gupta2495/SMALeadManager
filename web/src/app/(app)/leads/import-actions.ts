@@ -37,6 +37,15 @@ function dedupeKey(phone: string, student: string | null, parent: string | null)
 export async function importWhatsAppLeadsAction(
   jsonString: string,
 ): Promise<ImportResult> {
+  try {
+    return await _importWhatsAppLeads(jsonString);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `Server error: ${msg}` };
+  }
+}
+
+async function _importWhatsAppLeads(jsonString: string): Promise<ImportResult> {
   // Verify authentication first; the actual insert uses the service-role
   // client because it needs admin-level access.
   await getCurrentProfile();
